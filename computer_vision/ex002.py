@@ -1,21 +1,33 @@
-import numpy as np
 import tensorflow as tf
 
 fashion_mnist = tf.keras.datasets.fashion_mnist
 
-(train_images, train_labels), (test_images, test_label) = fashion_mnist.load_data()
+(train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
+
+train_images = train_images / 255.0
+test_images = test_images / 255.0
 
 model = tf.keras.Sequential([
-    tf.keras.Input(shape=(28, 28)), # formato dos dados
-    tf.keras.layers.Flatten(), # transforma o 28x28 em uma matriz simples linear
-    tf.keras.layers.Dense(128, activation=tf.nn.relu),
-    tf.keras.layers.Dense(10, activation=tf.nn.softmax) # 10 pois tem 10 tipos de inputs, 10 tipos de roupas no caso
+    tf.keras.Input(shape=(28, 28)),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(128, activation="relu"),
+    tf.keras.layers.Dense(10, activation="softmax")
 ])
 
-model.compile(optimizer = tf.optimizers.Adam(),
+model.compile(optimizer=tf.keras.optimizers.Adam(),
               loss="sparse_categorical_crossentropy",
-              metrics=['accuracy'])
+              metrics=["accuracy"])
 
-model.fit(train_images, train_labels, epochs=5)
+class myCallback(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        if logs.get("accuracy") > 0.90:  
+            print("\nAcurácia passou de 90%, parando o treinamento!")
+            self.model.stop_training = True
 
-model.evaluate(test_images, test_label)
+callbacks = myCallback()
+
+# treina modelo
+model.fit(train_images, train_labels, epochs=5, callbacks=[callbacks])
+
+# avalia no conjunto de teste
+model.evaluate(test_images, test_labels)
