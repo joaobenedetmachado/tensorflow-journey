@@ -18,4 +18,4 @@ ys = np.array([-3.0, -1.0, 1.0, 3.0, 5.0, 7.0], dtype=float)
 
 model.fit(xs, ys, epochs=500) # as epocas sao os loops, entao ele treina o x para encontrar o y nesse caso, 500 vezes
 
-model.predict(np.array([10.0])) # ele vai tentar encontrar o y de 10, caso x = 10
+print(f'model predicion: {model.predict(np.array([10.0]), verbose=0).item():.5f}')
