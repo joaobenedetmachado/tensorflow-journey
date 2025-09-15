@@ -1,0 +1,3 @@
+# Ignorar pastas específicas dentro de dogs_x_cats
+dogs_x_cats/test1/
+dogs_x_cats/train/
