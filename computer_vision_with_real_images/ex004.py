@@ -101,15 +101,42 @@ validation_dataset = tf.keras.utils.image_dataset_from_directory(
     )
 
 
-rescale_layer = tf.keras.layers.Rescaling(scale = 1./255)
+rescale_layer = tf.keras.layers.Rescaling(1./255)
 
-train_dataset_scaled = train_dataset.map(
-    lambda image, label : (rescale_layer(image), label)
+train_dataset_scaled = train_dataset.map(lambda image, label: (rescale_layer(image), label))
+validation_dataset_scaled = validation_dataset.map(lambda image, label: (rescale_layer(image), label))
+
+SHUFFLE_BUFFER_SIZE = 1000
+PREFETCH_BUFFER_SIZE = tf.data.AUTOTUNE
+
+train_dataset_final = (train_dataset_scaled
+                       .cache()
+                       .shuffle(SHUFFLE_BUFFER_SIZE)
+                       .prefetch(PREFETCH_BUFFER_SIZE)
+                      )
+
+validation_dataset_final = (validation_dataset_scaled
+                            .cache()
+                            .prefetch(PREFETCH_BUFFER_SIZE)
+                            )
+
+history = model.fit(
+      train_dataset_final,
+      epochs=15,
+      validation_data = validation_dataset_final,
+      verbose=2
 )
 
-train_dataset_final = (
-    train_dataset_scaled
-    .cache()
-    .shuffle(buffer_size=1000)
-    .prefetch(buffer_size=tf.data.AUTOTUNE)
-)
+acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+
+epochs = range(len(acc))
+
+plt.plot(epochs, acc, 'r', label='Training accuracy')
+plt.plot(epochs, val_acc, 'b', label='Validation accuracy')
+plt.title('Training and validation accuracy')
+plt.legend(loc=0)
+plt.show()
+
