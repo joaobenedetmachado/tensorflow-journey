@@ -38,3 +38,28 @@ model = tf.keras.models.Sequential(
 )
 
 model.summary()
+
+data_augmentation = tf.keras.models.Sequential(
+    [
+        tf.keras.Input(shape=(150, 150, 3)),
+        tf.keras.layers.RandomFlip('horizontal'),
+        tf.keras.layers.RandomRotation(0.2, fill_mode='nearest'),
+        tf.keras.layers.RandomTranslation(0.2, 0.2, fill_mode='nearest'),
+        tf.keras.layers.RandomZoom(0.2, fill_mode='nearest')
+    ]
+)
+
+model_without_aug = create_model()
+
+model_with_aug = tf.keras.models.Sequential(
+    [
+        data_augmentation,
+        model_without_aug
+    ]
+)
+
+model_with_aug.compile(
+    loss='binary_crossentropy',
+    optimizer=tf.keras.optimizers.RMSprop(learning_rate=1e-4),
+    metrics=['accuracy']
+)
