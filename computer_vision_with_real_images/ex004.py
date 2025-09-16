@@ -77,7 +77,7 @@ model = tf.keras.models.Sequential([
     # 512 neuron hidden layer
     tf.keras.layers.Dense(512, activation='relu'),
     # Only 1 output neuron. It will contain a value from 0 to 1 where 0 is for 'horses' and 1 for 'humans'
-    tf.keras.layers.Dense(1, activation='sigmoid')
+    tf.keras.layers.Dense(1, activation='sigmoid') 
 ])
 
 model.summary()
