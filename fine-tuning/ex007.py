@@ -2,6 +2,13 @@ import tensorflow as tf
 
 local_weights_file = r'/home/joao/tensorflow-journey/fine-tuning/inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5'
 
+fashion_mnist = tf.keras.datasets.fashion_mnist
+
+(train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
+
+train_images = train_images / 255.0
+test_images = test_images / 255.0
+
 pre_treined_model = tf.keras.applications.inception_v3.InceptionV3(
     input_shape=(150, 150, 3),
     include_top=False,
@@ -29,8 +36,9 @@ model.compile(
 )
 
 history = model.fit(
-    train_dataset_final,
-    validation_data=validation_dataset_final,
+    train_images,
+    train_labels,
+    validation_data=(test_images, test_labels),
     epochs=20,
     verbose=2
 )
