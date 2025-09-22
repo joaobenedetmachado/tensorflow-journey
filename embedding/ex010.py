@@ -32,6 +32,43 @@ def padding(sequences):
 
     return padded_seq
 
+#Texto cru → ["this movie was great"]
+
+#Vectorization → [45, 67, 812, 23]
+
+#Padding (tamanho 120) → [0, 0, 0, ..., 45, 67, 812, 23]
 
 train_sequences = train_reviews.map(lambda text: vectorize_layer(text).apply(padding))
 test_sequences = test_reviews.map(lambda text: vectorize_layer(text).apply(padding))
+
+train_ds_vectorized = tf.data.Dataset.zip(train_sequences, train_labels)
+test_ds_vectorized = tf.data.Dataset.zip(test_sequences, test_labels)
+
+SHUFFLE_BUFFER_SZ = 1000
+PREFETCH_BUFFER_SZ = tf.data.AUTOTUNE
+BATCH_SZ = 32
+
+train_ds_final = (
+    train_ds_vectorized
+    .cache()
+    .shuffle(SHUFFLE_BUFFER_SZ)
+    .prefetch(PREFETCH_BUFFER_SZ)
+    .batch(BATCH_SZ)
+)
+
+test_ds_final = (
+    test_ds_vectorized
+    .cache()
+    .prefetch(PREFETCH_BUFFER_SZ)
+    .batch(BATCH_SZ)
+)
+
+model = tf.keras.Sequencial([
+    tf.keras.Input(shape=(120,)),
+    tf.keras.layers.Embedding(input_dim=10000, output_dim=16),
+    tf.keras.layers.GlobalAveragePooling1D(),
+    tf.keras.layers.Dense(6, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+model.summary()
