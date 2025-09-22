@@ -21,7 +21,7 @@ vectorize_layer = tf.keras.layers.TextVectorization(max_tokens=10000)
 
 vectorize_layer.adapt(train_reviews)
 
-def padding(sequences):
+def padding(sequences): #formatacao dos vetores das palavras
     sequences = sequences.ragged_batch(batch_size=sequences.cardinality())
     sequences = sequences.get_single_element()
 
@@ -71,4 +71,9 @@ model = tf.keras.Sequencial([
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
+model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+
 model.summary()
+
+EPOCHS = 10
+history = model.fit(train_ds_final, epochs=EPOCHS, validation_data=test_ds_final)
