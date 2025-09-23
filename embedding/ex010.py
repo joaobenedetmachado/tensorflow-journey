@@ -1,5 +1,6 @@
 import tensorflow_datasets as tfds
 import tensorflow as tf
+import io
 
 imdb, info = tfds.load("imdb_reviews", with_info=True, as_supervised=True)
 
@@ -77,3 +78,18 @@ model.summary()
 
 EPOCHS = 10
 history = model.fit(train_ds_final, epochs=EPOCHS, validation_data=test_ds_final)
+
+out_v = io.open('vecs.tsv', 'w', encoding='utf-8')
+out_m = io.open('meta.tsv', 'w', encoding='utf-8')
+
+vocab = vectorize_layer.get_vocabulary()
+
+for word_num in range(1, len(vocab)):
+    word = vocab[word_num]
+    embeddings = model.layers[1].get_weights()[0][word_num]
+
+    out_m.write(word + "\n")
+    out_v.write('\t'.join([str(x) for x in embeddings]) + "\n")
+
+out_v.close()
+out_m.close()
