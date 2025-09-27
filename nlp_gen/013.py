@@ -30,3 +30,9 @@ input_sequences = np.array(tf.keras.utils.pad_sequences(
     padding='pre'
 ))
 
+print(input_sequences)
+
+xs = input_sequences[:,:-1]
+labels = input_sequences[:,-1]
+
+ys = tf.keras.utils.to_categorical(labels, num_classes=vocab_size)
