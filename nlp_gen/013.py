@@ -36,3 +36,20 @@ xs = input_sequences[:,:-1]
 labels = input_sequences[:,-1]
 
 ys = tf.keras.utils.to_categorical(labels, num_classes=vocab_size)
+
+model = tf.keras.Sequential([
+    tf.keras.Input(shape=(max_sequence_len-1,)),
+    tf.keras.layers.Embedding(vocab_size,64),\
+    tf.keras.layers.LSTM(20), # RNN onde a sequencial importa
+    tf.keras.layers.Dense(vocab_size, activation='softmax')
+])
+
+model.compile(
+    loss='categorical_crossentropy',
+    optimizer='adam',
+    metrics=['accuracy']
+)
+
+model.fit(
+    xs, ys, epochs=500
+)
