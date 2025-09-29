@@ -53,3 +53,17 @@ model.compile(
 model.fit(
     xs, ys, epochs=500
 )
+
+seed_text = "Laurence went to"
+
+next_sequence = vectorize_layer(seed_text)
+
+prob = model.predict(next_sequence, verbose=0)
+
+predicted = np.argmax(prob, axis=-1)[0]
+
+output_word = vocabulary[predicted]
+
+seed_text += " " + output_word
+
+print(seed_text)

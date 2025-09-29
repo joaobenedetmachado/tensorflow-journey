@@ -7,7 +7,7 @@ imdb = tfds.load("imdb_reviews", with_info=True, as_supervised=True)
 train_reviews = imdb['train'].map(lambda review, label: review)
 train_labels = imdb['train'].map(lambda review, label: label)
 
-keras.nlp.tokenizers.compute_word_piece_tokenizer(
+keras_nlp.tokenizers.compute_word_piece_tokenizer(
     train_reviews,
     vocabulary_size=10000,
     lowercase=True,
