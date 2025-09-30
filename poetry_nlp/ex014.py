@@ -1,7 +1,11 @@
 import tensorflow as tf
 import numpy as np
+data = open('/home/joao/tensorflow-journey/poetry_nlp/data.txt').read()
 
-data = 'In the town of Athy one Jeremy Lanigan\nBattered away til he hadn\'t a pound.\nHis father died and made him a'
+print(data)
+
+input_sequences = []
+
 
 corpus = data.lower().split('\n')
 
@@ -22,7 +26,6 @@ for line in corpus:
 
 max_sequence_len = max([len(x) for x in input_sequences])
 
-print(max_sequence_len)
 
 input_sequences = np.array(tf.keras.utils.pad_sequences(
     input_sequences,
@@ -33,40 +36,23 @@ input_sequences = np.array(tf.keras.utils.pad_sequences(
 print(input_sequences)
 
 xs, labels = input_sequences[:,:-1],input_sequences[:,-1]
-labels = input_sequences[:,-1]
-
 ys = tf.keras.utils.to_categorical(labels, num_classes=vocab_size)
 
-model = tf.keras.Sequential([
+labels = input_sequences[:,-1]
+
+
+model  = tf.keras.Sequential([
     tf.keras.Input(shape=(max_sequence_len-1,)),
-    tf.keras.layers.Embedding(vocab_size,64),\
-    tf.keras.layers.LSTM(20), # RNN onde a sequencial importa
-    tf.keras.layers.Dense(vocab_size, activation='softmax')
+    tf.keras.layers.Embedding(2704, 100),
+    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(150)), # sequencia importa
+    tf.keras.layers.Dense(2704, activation='softmax')
 ])
 
-model.compile(
-    loss='categorical_crossentropy',
-    optimizer='adam',
-    metrics=['accuracy']
-)
+adam = tf.keras.optimizers.Adam(learning_rate=0.01)
 
-model.fit(
-    xs, ys, epochs=500
-)
+model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
 
-seed_text = "Laurence went to"
-
-next_sequence = vectorize_layer(seed_text)
-
-prob = model.predict(next_sequence, verbose=0)
-
-predicted = np.argmax(prob, axis=-1)[0]
-
-output_word = vocabulary[predicted]
-
-seed_text += " " + output_word
-
-print(seed_text)
+model.fit(xs, ys, epochs=100)
 
 seed_text = "help me obi-wan kenobi youre my only hope"
 
@@ -98,4 +84,4 @@ for _ in range(next_words):
 		seed_text += " " + output_word
 
 # Print the result
-print(seed_text)y
+print(seed_text)
